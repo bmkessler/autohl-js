@@ -23,17 +23,54 @@ function sentence_tokenizer(raw_text) {
 function word_tokenizer(sentence_text) {
   /***********
   
-  Split on whitespace, can't think of any obvious cases to catch
+  Split on whitespace, can't think of any obvious cases to catch. 
+  Also split on punctuation except "'"?
+  If strip punctuation here, must account for contractions in stop word list.
   
   ***********/
+}
+
+function normalize_word_sentences(word_sentences) {
+  /******
+  convert incoming words to lowercase if not stop words
+  ******/
+  var norm_word_sentences = [];
+  norm_word_sentences.length = word_sentences.length;
+  for(var i in word_sentences) {
+    norm_word_sentences[i] = [];
+    for(var j in word_sentences[i]) {
+      if(!is_stop_word(word_sentences[i][j]))
+        norm_word_sentences[i].push(word_sentences[i][j].toLowerCase());
+    }
+  }
+  return norm_word_sentences;
+}
+
+function stem_words(norm_word_sentences) {
+  /*****
+  Stem each word and place into object as key to capture set property
+  *****/
+  var stem_sentences = [];
+  stem_sentences.length = norm_word_sentences.length;
+  for(var i in word_sentences) {
+    stem_sentences[i] = {};
+    for(var j in norm_word_sentences[i]) {
+      if(!is_stop_word(norm_word_sentences[i][j]))
+        stem_sentences[i][stemmer(norm_word_sentences[i][j])] = 1;
+    }
+  }
+  return stem_sentences;
+
 }
 
 function is_stop_word(word) {
   /***********
   
-  Check if in stop word list
+  Check if in stop word list, for now replicating dumb method from Python code of checking length
   
   ***********/
+  var min_word_length = 5;
+  return word.length < min_word_length;
 }
 
 function sim_text_rank(sent_1,sent_2,options) {
@@ -51,7 +88,7 @@ function sim_text_rank(sent_1,sent_2,options) {
         options[opt] = default_options[opt];
     };
     var numerator = 0;
-    for(item in sent_1)
+    for(var item in sent_1)
       if(sent_1.hasOwnProperty(item) && sent_2.hasOwnProperty(item))
         numerator++;
     if(numerator>0)
@@ -348,6 +385,12 @@ Test code below
 
 **************/
 
+var sentences = ['Clustering data by identifying a subset of representative examples is important for processing\nsensory signals and detecting patterns in data.', 'Such \xe2\x80\x9cexemplars\xe2\x80\x9d can be found by randomly\nchoosing an initial subset of data points and then iteratively refining it, but this works well only if\nthat initial choice is close to a good solution.', 'We devised a method called \xe2\x80\x9caffinity propagation,\xe2\x80\x9d\nwhich takes as input measures of similarity between pairs of data points.', 'Real-valued messages are\nexchanged between data points until a high-quality set of exemplars and corresponding clusters\ngradually emerges.', 'We used affinity propagation to cluster images of faces, detect genes in\nmicroarray data, identify representative sentences in this manuscript, and identify cities that are\nefficiently accessed by airline travel.', 'Affinity propagation found clusters with much lower error than\nother methods, and it did so in less than one-hundredth the amount of time.'];
+
+var word_sentences = [['Clustering', 'data', 'by', 'identifying', 'a', 'subset', 'of', 'representative', 'examples', 'is', 'important', 'for', 'processing', 'sensory', 'signals', 'and', 'detecting', 'patterns', 'in', 'data', '.'], ['Such', '\u201c', 'exemplars', '\u201d', 'can', 'be', 'found', 'by', 'randomly', 'choosing', 'an', 'initial', 'subset', 'of', 'data', 'points', 'and', 'then', 'iteratively', 'refining', 'it', ',', 'but', 'this', 'works', 'well', 'only', 'if', 'that', 'initial', 'choice', 'is', 'close', 'to', 'a', 'good', 'solution', '.'], ['We', 'devised', 'a', 'method', 'called', '\u201c', 'affinity', 'propagation', ',\u201d', 'which', 'takes', 'as', 'input', 'measures', 'of', 'similarity', 'between', 'pairs', 'of', 'data', 'points', '.'], ['Real', '-', 'valued', 'messages', 'are', 'exchanged', 'between', 'data', 'points', 'until', 'a', 'high', '-', 'quality', 'set', 'of', 'exemplars', 'and', 'corresponding', 'clusters', 'gradually', 'emerges', '.'], ['We', 'used', 'affinity', 'propagation', 'to', 'cluster', 'images', 'of', 'faces', ',', 'detect', 'genes', 'in', 'microarray', 'data', ',', 'identify', 'representative', 'sentences', 'in', 'this', 'manuscript', ',', 'and', 'identify', 'cities', 'that', 'are', 'efficiently', 'accessed', 'by', 'airline', 'travel', '.'], ['Affinity', 'propagation', 'found', 'clusters', 'with', 'much', 'lower', 'error', 'than', 'other', 'methods', ',', 'and', 'it', 'did', 'so', 'in', 'less', 'than', 'one', '-', 'hundredth', 'the', 'amount', 'of', 'time', '.']];
+
+var norm_word_sentences = [['clustering', 'identifying', 'subset', 'representative', 'examples', 'important', 'processing', 'sensory', 'signals', 'detecting', 'patterns'], ['exemplars', 'found', 'randomly', 'choosing', 'initial', 'subset', 'points', 'iteratively', 'refining', 'works', 'initial', 'choice', 'close', 'solution'], ['devised', 'method', 'called', 'affinity', 'propagation', 'which', 'takes', 'input', 'measures', 'similarity', 'between', 'pairs', 'points'], ['valued', 'messages', 'exchanged', 'between', 'points', 'until', 'quality', 'exemplars', 'corresponding', 'clusters', 'gradually', 'emerges'], ['affinity', 'propagation', 'cluster', 'images', 'faces', 'detect', 'genes', 'microarray', 'identify', 'representative', 'sentences', 'manuscript', 'identify', 'cities', 'efficiently', 'accessed', 'airline', 'travel'], ['affinity', 'propagation', 'found', 'clusters', 'lower', 'error', 'other', 'methods', 'hundredth', 'amount']];
+
 var stem_sentences = [{'subset':1, 'sensori':1, 'detect':1, 'identifi':1, 'process':1, 'pattern':1, 'signal':1, 'repres':1, 'cluster':1, 'exampl':1, 'import':1}, {'randomli':1, 'subset':1, 'work':1, 'point':1, 'solut':1, 'refin':1, 'choic':1, 'initi':1, 'exemplar':1, 'iter':1, 'choos':1, 'close':1, 'found':1}, {'propag':1, 'measur':1, 'similar':1, 'point':1, 'affin':1, 'call':1, 'take':1, 'which':1, 'between':1, 'pair':1, 'input':1, 'devis':1, 'method':1}, {'gradual':1, 'point':1, 'exchang':1, 'qualiti':1, 'correspond':1, 'messag':1, 'cluster':1, 'emerg':1, 'exemplar':1, 'between':1, 'until':1, 'val':1}, {'propag':1, 'repres':1, 'detect':1, 'identifi':1, 'manuscript':1, 'microarray':1, 'airlin':1, 'sentenc':1, 'imag':1, 'face':1, 'access':1, 'cluster':1, 'citi':1, 'effici':1, 'gene':1, 'affin':1, 'travel':1}, {'propag':1, 'lower':1, 'hundredth':1, 'method':1, 'cluster':1, 'amount':1, 'other':1, 'error':1, 'found':1, 'affin':1}];
 
 var sim_matrix = [[ 0.        ,  0.20142925,  0.        ,  0.20472742,  0.76443755,         0.21265788],
@@ -364,3 +407,28 @@ console.log(generate_similarity_matrix(stem_sentences));
 console.log(page_rank(sim_matrix));
 console.log(sum(pr));
 console.log(Object.keys(stem_sentences[0]).length);
+for(row in sentences) console.log(sentences[row]);
+console.log(is_stop_word('data'));
+console.log(is_stop_word('datum'));
+console.log(is_stop_word('clustering'));
+
+var test_norm_word_sentences = normalize_word_sentences(word_sentences);
+console.log(test_norm_word_sentences);
+
+var test_stem_sentences = stem_words(test_norm_word_sentences);
+console.log(test_stem_sentences);
+
+for(row in test_stem_sentences) {
+  console.log('Stems not matched from code');
+  for(var item in test_stem_sentences[row])
+      if(test_stem_sentences[row].hasOwnProperty(item) && !stem_sentences[row].hasOwnProperty(item))
+        console.log(item);
+  console.log('Stems not matched produced by code');
+  for(var item in stem_sentences[row])
+      if(stem_sentences[row].hasOwnProperty(item) && !test_stem_sentences[row].hasOwnProperty(item))
+        console.log(item);
+}
+
+var test_sim_matrix = generate_similarity_matrix(test_stem_sentences);
+var test_pr = page_rank(test_sim_matrix);
+console.log(test_pr);
