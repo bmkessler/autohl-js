@@ -1,10 +1,10 @@
 /*********
 
 1. Get text from the DOM, may need to deal with formatting tags
-2. Tokenize text into sentences  (split on .!? is first attempt)
-3. Tokenize sentences into words (split on white space is first attempt) 
-4. Remove stop words (not sure if this is needed, but can use Porter's list)
-5. Normalize words; lower-case, punctuation removed, stemmed  (Porter stemmer included)
+2. Tokenize text into sentences  (split on .!? is first attempt) (DONE)
+3. Tokenize sentences into words (split on white space is first attempt) (DONE)
+4. Remove stop words (not sure if this is needed, but can use Porter's list) (using min_word_length like Python code)
+5. Normalize words; lower-case, punctuation removed, stemmed  (Porter stemmer included)  (DONE)
 6. Compute simliarity matrix (DONE)
 7. Calculate ranks via PageRank (DONE)
 8. Tag words back in the DOM by their rank
@@ -14,10 +14,12 @@
 function sentence_tokenizer(raw_text) {
   /***********
   
-  Split on [.!?][ ]+ unless abbreviation (single letter U.S.A. e.g. i.e. or known list Mr. Mrs. Dr.)
+  Split on [.!?]\s+ unless abbreviation (single letter U.S.A. e.g. i.e. or known list Mr. Mrs. Dr.)
   also could handle edge case of quoted character "?" or parenthetical (!!!)
   
   ***********/
+  
+  return raw_text.split(/[.!?]\s+/);
 }
 
 function word_tokenizer(sentence_text) {
@@ -28,6 +30,8 @@ function word_tokenizer(sentence_text) {
   If strip punctuation here, must account for contractions in stop word list.
   
   ***********/
+  var punctRE = /[\u2000-\u206F\u2E00\u2E7F\\'!"#\$%&\(\)\*\+,\.\/:;<=>\?@\[\]\^_`\{\|\}~]/g;
+  return sentence_text.replace(punctRE,'').split(/[\-\s]+/);
 }
 
 function normalize_word_sentences(word_sentences) {
@@ -385,7 +389,9 @@ Test code below
 
 **************/
 
-var sentences = ['Clustering data by identifying a subset of representative examples is important for processing\nsensory signals and detecting patterns in data.', 'Such \xe2\x80\x9cexemplars\xe2\x80\x9d can be found by randomly\nchoosing an initial subset of data points and then iteratively refining it, but this works well only if\nthat initial choice is close to a good solution.', 'We devised a method called \xe2\x80\x9caffinity propagation,\xe2\x80\x9d\nwhich takes as input measures of similarity between pairs of data points.', 'Real-valued messages are\nexchanged between data points until a high-quality set of exemplars and corresponding clusters\ngradually emerges.', 'We used affinity propagation to cluster images of faces, detect genes in\nmicroarray data, identify representative sentences in this manuscript, and identify cities that are\nefficiently accessed by airline travel.', 'Affinity propagation found clusters with much lower error than\nother methods, and it did so in less than one-hundredth the amount of time.'];
+var raw_text = 'Clustering data by identifying a subset of representative examples is important for processing\nsensory signals and detecting patterns in data. Such \u201cexemplars\u201d can be found by randomly\nchoosing an initial subset of data points and then iteratively refining it, but this works well only if\nthat initial choice is close to a good solution. We devised a method called \u201caffinity propagation,\u201d\nwhich takes as input measures of similarity between pairs of data points. Real-valued messages are\nexchanged between data points until a high-quality set of exemplars and corresponding clusters\ngradually emerges. We used affinity propagation to cluster images of faces, detect genes in\nmicroarray data, identify representative sentences in this manuscript, and identify cities that are\nefficiently accessed by airline travel. Affinity propagation found clusters with much lower error than\nother methods, and it did so in less than one-hundredth the amount of time.';
+
+var sentences = ['Clustering data by identifying a subset of representative examples is important for processing\nsensory signals and detecting patterns in data.', 'Such \u201cexemplars\u201d can be found by randomly\nchoosing an initial subset of data points and then iteratively refining it, but this works well only if\nthat initial choice is close to a good solution.', 'We devised a method called \u201caffinity propagation,\u201d\nwhich takes as input measures of similarity between pairs of data points.', 'Real-valued messages are\nexchanged between data points until a high-quality set of exemplars and corresponding clusters\ngradually emerges.', 'We used affinity propagation to cluster images of faces, detect genes in\nmicroarray data, identify representative sentences in this manuscript, and identify cities that are\nefficiently accessed by airline travel.', 'Affinity propagation found clusters with much lower error than\nother methods, and it did so in less than one-hundredth the amount of time.'];
 
 var word_sentences = [['Clustering', 'data', 'by', 'identifying', 'a', 'subset', 'of', 'representative', 'examples', 'is', 'important', 'for', 'processing', 'sensory', 'signals', 'and', 'detecting', 'patterns', 'in', 'data', '.'], ['Such', '\u201c', 'exemplars', '\u201d', 'can', 'be', 'found', 'by', 'randomly', 'choosing', 'an', 'initial', 'subset', 'of', 'data', 'points', 'and', 'then', 'iteratively', 'refining', 'it', ',', 'but', 'this', 'works', 'well', 'only', 'if', 'that', 'initial', 'choice', 'is', 'close', 'to', 'a', 'good', 'solution', '.'], ['We', 'devised', 'a', 'method', 'called', '\u201c', 'affinity', 'propagation', ',\u201d', 'which', 'takes', 'as', 'input', 'measures', 'of', 'similarity', 'between', 'pairs', 'of', 'data', 'points', '.'], ['Real', '-', 'valued', 'messages', 'are', 'exchanged', 'between', 'data', 'points', 'until', 'a', 'high', '-', 'quality', 'set', 'of', 'exemplars', 'and', 'corresponding', 'clusters', 'gradually', 'emerges', '.'], ['We', 'used', 'affinity', 'propagation', 'to', 'cluster', 'images', 'of', 'faces', ',', 'detect', 'genes', 'in', 'microarray', 'data', ',', 'identify', 'representative', 'sentences', 'in', 'this', 'manuscript', ',', 'and', 'identify', 'cities', 'that', 'are', 'efficiently', 'accessed', 'by', 'airline', 'travel', '.'], ['Affinity', 'propagation', 'found', 'clusters', 'with', 'much', 'lower', 'error', 'than', 'other', 'methods', ',', 'and', 'it', 'did', 'so', 'in', 'less', 'than', 'one', '-', 'hundredth', 'the', 'amount', 'of', 'time', '.']];
 
@@ -403,6 +409,9 @@ var sim_matrix = [[ 0.        ,  0.20142925,  0.        ,  0.20472742,  0.764437
 
 var pr = [ 0.9206212 ,  0.71242271,  1.03351121,  0.94268736,  1.21602883, 1.17472869];
 
+
+/***
+
 console.log(generate_similarity_matrix(stem_sentences));
 console.log(page_rank(sim_matrix));
 console.log(sum(pr));
@@ -419,16 +428,83 @@ var test_stem_sentences = stem_words(test_norm_word_sentences);
 console.log(test_stem_sentences);
 
 for(row in test_stem_sentences) {
-  console.log('Stems not matched from code');
+
   for(var item in test_stem_sentences[row])
-      if(test_stem_sentences[row].hasOwnProperty(item) && !stem_sentences[row].hasOwnProperty(item))
+      if(test_stem_sentences[row].hasOwnProperty(item) && !stem_sentences[row].hasOwnProperty(item)) {
+        console.log('Stem not matched from code');
         console.log(item);
-  console.log('Stems not matched produced by code');
+      }
+  
   for(var item in stem_sentences[row])
-      if(stem_sentences[row].hasOwnProperty(item) && !test_stem_sentences[row].hasOwnProperty(item))
+      if(stem_sentences[row].hasOwnProperty(item) && !test_stem_sentences[row].hasOwnProperty(item))  {
+        console.log('Stem not matched produced by code');
         console.log(item);
+      }
 }
 
 var test_sim_matrix = generate_similarity_matrix(test_stem_sentences);
 var test_pr = page_rank(test_sim_matrix);
 console.log(test_pr);
+
+console.log(sentence_tokenizer(raw_text));
+
+console.log(word_tokenizer(sentences[0]));
+
+console.log(generate_similarity_matrix(stem_sentences));
+console.log(page_rank(sim_matrix));
+***/
+
+var test_raw_sentences = sentence_tokenizer(raw_text);
+var test_word_sentences = [];
+test_word_sentences.length = test_raw_sentences.length;
+for(var i in test_raw_sentences) {
+  test_word_sentences[i] = word_tokenizer(test_raw_sentences[i]);
+}
+var test_norm_word_sentences = normalize_word_sentences(test_word_sentences);
+//console.log(test_norm_word_sentences);
+
+var test_stem_sentences = stem_words(test_norm_word_sentences);
+
+console.log('Sentence tokenization, word splitting and stemming errors:');
+
+for(row in test_stem_sentences) {
+
+  for(var item in test_stem_sentences[row])
+      if(test_stem_sentences[row].hasOwnProperty(item) && !stem_sentences[row].hasOwnProperty(item)) {
+        console.log('Stem produced by code but not found in test data: ' + item);
+      }
+  
+  for(var item in stem_sentences[row])
+      if(stem_sentences[row].hasOwnProperty(item) && !test_stem_sentences[row].hasOwnProperty(item))  {
+        console.log('Stem not produced by code but in test data: ' + item);
+      }
+}
+
+//console.log(test_stem_sentences);
+
+var test_sim_matrix = generate_similarity_matrix(test_stem_sentences);
+var test_pr = page_rank(test_sim_matrix);
+
+//console.log(test_pr);
+
+console.log('\nDifference in produced TextRanks (convergence tolerance = 1e-8):');
+for(var i in test_pr)
+  console.log(test_pr[i]-pr[i]);
+
+/*******
+for(var i in test_norm_word_sentences) 
+  for(var j in test_norm_word_sentences[i]) {
+    console.log(norm_word_sentences[i][j]+' '+test_norm_word_sentences[i][j]);
+}  
+
+for(var i in test_stem_sentences) 
+  for(var item in test_stem_sentences[i]) {
+    console.log(item);
+}  
+//console.log(word_sentences);
+//console.log(test_word_sentences);
+//console.log('test'+' me');
+
+console.log('\u201d');
+console.log(raw_text);
+********/
