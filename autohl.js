@@ -389,6 +389,8 @@ Test code below
 
 **************/
 
+//  Incoming test data and expected intermediate results
+
 var raw_text = 'Clustering data by identifying a subset of representative examples is important for processing\nsensory signals and detecting patterns in data. Such \u201cexemplars\u201d can be found by randomly\nchoosing an initial subset of data points and then iteratively refining it, but this works well only if\nthat initial choice is close to a good solution. We devised a method called \u201caffinity propagation,\u201d\nwhich takes as input measures of similarity between pairs of data points. Real-valued messages are\nexchanged between data points until a high-quality set of exemplars and corresponding clusters\ngradually emerges. We used affinity propagation to cluster images of faces, detect genes in\nmicroarray data, identify representative sentences in this manuscript, and identify cities that are\nefficiently accessed by airline travel. Affinity propagation found clusters with much lower error than\nother methods, and it did so in less than one-hundredth the amount of time.';
 
 var sentences = ['Clustering data by identifying a subset of representative examples is important for processing\nsensory signals and detecting patterns in data.', 'Such \u201cexemplars\u201d can be found by randomly\nchoosing an initial subset of data points and then iteratively refining it, but this works well only if\nthat initial choice is close to a good solution.', 'We devised a method called \u201caffinity propagation,\u201d\nwhich takes as input measures of similarity between pairs of data points.', 'Real-valued messages are\nexchanged between data points until a high-quality set of exemplars and corresponding clusters\ngradually emerges.', 'We used affinity propagation to cluster images of faces, detect genes in\nmicroarray data, identify representative sentences in this manuscript, and identify cities that are\nefficiently accessed by airline travel.', 'Affinity propagation found clusters with much lower error than\nother methods, and it did so in less than one-hundredth the amount of time.'];
@@ -410,49 +412,7 @@ var sim_matrix = [[ 0.        ,  0.20142925,  0.        ,  0.20472742,  0.764437
 var pr = [ 0.9206212 ,  0.71242271,  1.03351121,  0.94268736,  1.21602883, 1.17472869];
 
 
-/***
-
-console.log(generate_similarity_matrix(stem_sentences));
-console.log(page_rank(sim_matrix));
-console.log(sum(pr));
-console.log(Object.keys(stem_sentences[0]).length);
-for(row in sentences) console.log(sentences[row]);
-console.log(is_stop_word('data'));
-console.log(is_stop_word('datum'));
-console.log(is_stop_word('clustering'));
-
-var test_norm_word_sentences = normalize_word_sentences(word_sentences);
-console.log(test_norm_word_sentences);
-
-var test_stem_sentences = stem_words(test_norm_word_sentences);
-console.log(test_stem_sentences);
-
-for(row in test_stem_sentences) {
-
-  for(var item in test_stem_sentences[row])
-      if(test_stem_sentences[row].hasOwnProperty(item) && !stem_sentences[row].hasOwnProperty(item)) {
-        console.log('Stem not matched from code');
-        console.log(item);
-      }
-  
-  for(var item in stem_sentences[row])
-      if(stem_sentences[row].hasOwnProperty(item) && !test_stem_sentences[row].hasOwnProperty(item))  {
-        console.log('Stem not matched produced by code');
-        console.log(item);
-      }
-}
-
-var test_sim_matrix = generate_similarity_matrix(test_stem_sentences);
-var test_pr = page_rank(test_sim_matrix);
-console.log(test_pr);
-
-console.log(sentence_tokenizer(raw_text));
-
-console.log(word_tokenizer(sentences[0]));
-
-console.log(generate_similarity_matrix(stem_sentences));
-console.log(page_rank(sim_matrix));
-***/
+//  Begin test code
 
 var test_raw_sentences = sentence_tokenizer(raw_text);
 var test_word_sentences = [];
@@ -491,20 +451,3 @@ console.log('\nDifference in produced TextRanks (convergence tolerance = 1e-8):'
 for(var i in test_pr)
   console.log(test_pr[i]-pr[i]);
 
-/*******
-for(var i in test_norm_word_sentences) 
-  for(var j in test_norm_word_sentences[i]) {
-    console.log(norm_word_sentences[i][j]+' '+test_norm_word_sentences[i][j]);
-}  
-
-for(var i in test_stem_sentences) 
-  for(var item in test_stem_sentences[i]) {
-    console.log(item);
-}  
-//console.log(word_sentences);
-//console.log(test_word_sentences);
-//console.log('test'+' me');
-
-console.log('\u201d');
-console.log(raw_text);
-********/
