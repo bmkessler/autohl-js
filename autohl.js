@@ -1,13 +1,13 @@
 /*********
 
-1. Get text from the DOM, may need to deal with formatting tags
-2. Tokenize text into sentences  (split on .!? is first attempt) (DONE)
-3. Tokenize sentences into words (split on white space is first attempt) (DONE)
-4. Remove stop words (not sure if this is needed, but can use Porter's list) (using min_word_length like Python code)
+1. Get text from the DOM, may need to deal with formatting tags  (currently pulling all textContent)
+2. Tokenize text into sentences  (split on .!? is first attempt) (rev0 DONE)
+3. Tokenize sentences into words (split on white space is first attempt) (rev0 DONE)
+4. Remove stop words (not sure if this is needed, but can use Porter's list) (rev0 using min_word_length like Python code DONE)
 5. Normalize words; lower-case, punctuation removed, stemmed  (Porter stemmer included)  (DONE)
 6. Compute simliarity matrix (DONE)
 7. Calculate ranks via PageRank (DONE)
-8. Tag words back in the DOM by their rank
+8. Tag words back in the DOM by their rank (currently dumping sentences and rank to console)
 
 **********/
 
@@ -383,6 +383,25 @@ var stemmer = (function(){
     }
 })();
 
+if(typeof document !== 'undefined') {
+  // called from within an html document
+  var raw_text = document.body.textContent;
+  var raw_sentences = sentence_tokenizer(raw_text);
+  var word_sentences = [];
+  word_sentences.length = raw_sentences.length;
+  for(var i in raw_sentences) {
+    word_sentences[i] = word_tokenizer(raw_sentences[i]);
+  }
+  var norm_word_sentences = normalize_word_sentences(word_sentences);
+
+  var stem_sentences = stem_words(norm_word_sentences);
+  var sim_matrix = generate_similarity_matrix(stem_sentences);
+  var pr = page_rank(sim_matrix);
+  for(var i in raw_sentences) {
+    console.log("sentence "+i+": "+raw_sentences[i]+"\nTextRank :"+pr[i]);
+  }
+}
+
 /**************
 
 Test code below
@@ -391,6 +410,9 @@ Test code below
 
 //  Incoming test data and expected intermediate results
 
+if(typeof document === 'undefined') {
+// if called as a stand-alone script, run the test output
+  
 var raw_text = 'Clustering data by identifying a subset of representative examples is important for processing\nsensory signals and detecting patterns in data. Such \u201cexemplars\u201d can be found by randomly\nchoosing an initial subset of data points and then iteratively refining it, but this works well only if\nthat initial choice is close to a good solution. We devised a method called \u201caffinity propagation,\u201d\nwhich takes as input measures of similarity between pairs of data points. Real-valued messages are\nexchanged between data points until a high-quality set of exemplars and corresponding clusters\ngradually emerges. We used affinity propagation to cluster images of faces, detect genes in\nmicroarray data, identify representative sentences in this manuscript, and identify cities that are\nefficiently accessed by airline travel. Affinity propagation found clusters with much lower error than\nother methods, and it did so in less than one-hundredth the amount of time.';
 
 var sentences = ['Clustering data by identifying a subset of representative examples is important for processing\nsensory signals and detecting patterns in data.', 'Such \u201cexemplars\u201d can be found by randomly\nchoosing an initial subset of data points and then iteratively refining it, but this works well only if\nthat initial choice is close to a good solution.', 'We devised a method called \u201caffinity propagation,\u201d\nwhich takes as input measures of similarity between pairs of data points.', 'Real-valued messages are\nexchanged between data points until a high-quality set of exemplars and corresponding clusters\ngradually emerges.', 'We used affinity propagation to cluster images of faces, detect genes in\nmicroarray data, identify representative sentences in this manuscript, and identify cities that are\nefficiently accessed by airline travel.', 'Affinity propagation found clusters with much lower error than\nother methods, and it did so in less than one-hundredth the amount of time.'];
@@ -451,3 +473,4 @@ console.log('\nDifference in produced TextRanks (convergence tolerance = 1e-8):'
 for(var i in test_pr)
   console.log(test_pr[i]-pr[i]);
 
+}
