@@ -385,7 +385,7 @@ var stemmer = (function(){
 
 if(typeof document !== 'undefined') {
   // called from within an html document
-  var raw_text = document.body.textContent;
+  var raw_text = document.body.textContent; // for now get all the text in the document
   var raw_sentences = sentence_tokenizer(raw_text);
   var word_sentences = [];
   word_sentences.length = raw_sentences.length;
@@ -397,9 +397,31 @@ if(typeof document !== 'undefined') {
   var stem_sentences = stem_words(norm_word_sentences);
   var sim_matrix = generate_similarity_matrix(stem_sentences);
   var pr = page_rank(sim_matrix);
-  for(var i in raw_sentences) {
+  for(var i in raw_sentences) {  // just log the sentences and page ranks to the console
     console.log("sentence "+i+": "+raw_sentences[i]+"\nTextRank :"+pr[i]);
   }
+  
+  function outputUpdate(level) {
+      document.querySelector('#highlight').value = level;
+      var sentences = document.querySelectorAll('mark');
+      for(i=0; i<sentences.length; i++) {// Cycle through them
+        // note if other marks are defined on the page, does this fail?
+        if(parseInt(sentences[i].dataset.highlight,10) <= level) // Change the color based on current level.
+          sentences[i].style.backgroundColor  = "yellow"; 
+        else
+          sentences[i].style.backgroundColor  = "white";
+      }
+  }
+
+  /********
+  Here is where we need to insert the slider code into the DOM
+  Create this programatically and inject at start of body centered in a div is probably best:
+  
+    <label for=fader>Highlight Level</label>
+    <input type=range min=0 max=100 value=0 id=fader step=1 onchange="outputUpdate(value)">
+    <output for=fader id=highlight>0</output></br>
+    
+  *********/
 }
 
 /**************
