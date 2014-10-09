@@ -401,8 +401,30 @@ if(typeof document !== 'undefined') {
     console.log("sentence "+i+": "+raw_sentences[i]+"\nTextRank :"+pr[i]);
   }
   
+    var control_div = document.createElement("div");
+    //control_div.setAttribute("align","center");
+    var label = document.createElement("label");
+    label.setAttribute("for","slider");
+    label.innerText = "Highlight Level";
+    var slider = document.createElement("input");
+    slider.setAttribute("type","range");
+    slider.setAttribute("min",0);
+    slider.setAttribute("max",100);
+    slider.setAttribute("step",1);
+    slider.setAttribute("value",0);
+    slider.setAttribute("name","slider");
+    slider.addEventListener("input", function(event) {output.value = slider.valueAsNumber; outputUpdate(event.target.value);});
+    var output = document.createElement("output");
+    output.setAttribute("for","slider");
+    output.setAttribute("name","display");
+    output.innerText = "0";
+    control_div.appendChild(label);
+    control_div.appendChild(slider);
+    control_div.appendChild(output);
+    document.body.insertBefore(control_div,document.body.firstChild);
+  
   function outputUpdate(level) {
-      document.querySelector('#highlight').value = level;
+      //document.querySelector('#highlight').value = level;
       var sentences = document.querySelectorAll('mark');
       for(i=0; i<sentences.length; i++) {// Cycle through them
         // note if other marks are defined on the page, does this fail?
