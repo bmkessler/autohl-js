@@ -385,7 +385,8 @@ var stemmer = (function(){
 
 if(typeof document !== 'undefined') {
   // called from within an html document
-  var raw_text = document.body.textContent; // for now get all the text in the document
+  // var raw_text = document.body.textContent; // for now get all the text in the document
+  var raw_text = window.article;
   var raw_sentences = sentence_tokenizer(raw_text);
   var word_sentences = [];
   word_sentences.length = raw_sentences.length;
